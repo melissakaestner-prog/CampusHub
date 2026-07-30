@@ -28,6 +28,10 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: pt.istec.mestrado.campushub
         GENERATE_INFOPLIST_FILE: false
+    scheme:
+      testTargets:
+        - CampusHubTests
+      gatherCoverageData: true
   CampusHubTests:
     type: bundle.unit-test
     platform: iOS

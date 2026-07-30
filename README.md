@@ -129,13 +129,14 @@ Cobrem as camadas exigidas no enunciado:
 - Tema claro/escuro (preferência persistida) e tipografia dinâmica (fontes semânticas do sistema);
 - Pesquisa e filtro por dia na listagem principal;
 - Pull-to-refresh;
-- Acessibilidade: `accessibilityElement(children: .combine)` nas células e rótulos nos controlos.
+- Acessibilidade: `accessibilityElement(children: .combine)` nas células e rótulos nos controlos;
+- **Pipeline de CI** ([.github/workflows/ci.yml](.github/workflows/ci.yml)): a cada push, um runner macOS gera o projeto com XcodeGen, compila, corre todos os testes no simulador e publica o build de simulador como artefacto (utilizável em serviços como o Appetize.io para demonstração no browser).
 
 ## Limitações e trabalho futuro
 
 - **Autenticação** fora do âmbito: o professor ativo é fixado em `AppConfig.currentProfessorID`;
 - Registos de horas criados offline não são colocados em fila para envio posterior (o registo exige ligação);
-- Localização multilingue (String Catalogs) e pipeline de CI ficam como evolução futura.
+- Localização multilingue (String Catalogs) fica como evolução futura.
 
 ## Divisão de tarefas
 
