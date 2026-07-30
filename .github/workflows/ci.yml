@@ -25,19 +25,32 @@ jobs:
             -project CampusHub.xcodeproj \
             -scheme CampusHub \
             -destination 'platform=iOS Simulator,name=iPhone 16' \
+            -resultBundlePath TestResults.xcresult \
             CODE_SIGNING_ALLOWED=NO 2>&1 | tee xcodebuild.log
 
-      - name: Expor erros como anotações e no resumo
+      - name: Expor falhas como anotações
         if: failure()
         run: |
-          echo "## Erros de compilação/testes" >> "$GITHUB_STEP_SUMMARY"
-          echo '```' >> "$GITHUB_STEP_SUMMARY"
-          grep -E "(error:|warning: .*deprecated|Testing failed|Test Suite .* failed|✘|failed \()" xcodebuild.log | sort -u | head -60 >> "$GITHUB_STEP_SUMMARY" || echo "(nenhuma linha de erro capturada — ver últimas 80 linhas abaixo)" >> "$GITHUB_STEP_SUMMARY"
-          tail -80 xcodebuild.log >> "$GITHUB_STEP_SUMMARY"
-          echo '```' >> "$GITHUB_STEP_SUMMARY"
-          grep -E "error:" xcodebuild.log | sort -u | head -20 | while IFS= read -r line; do
+          if [ -d TestResults.xcresult ]; then
+            xcrun xcresulttool get test-results summary --path TestResults.xcresult > summary.json 2>/dev/null || true
+            if [ -s summary.json ]; then
+              jq -r '"::notice::Testes — total: \(.totalTestCount // "?"), passaram: \(.passedTests // "?"), falharam: \(.failedTests // "?")"' summary.json || true
+              jq -r '.testFailures[]? | "::error::\(.testName // .testIdentifier // "?"): \((.failureText // "") | gsub("\n"; " ") | .[0:400])"' summary.json | head -10 || true
+            fi
+          fi
+          grep -E "error:|Fatal error|Testing failed" xcodebuild.log | grep -v "CoreData" | sort -u | head -8 | while IFS= read -r line; do
             echo "::error::$line"
           done
+
+      - name: Guardar log e resultados como artefacto
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log-e-resultados
+          path: |
+            xcodebuild.log
+            TestResults.xcresult
+          if-no-files-found: ignore
 
       - name: Build de simulador (artefacto para demo, ex. Appetize.io)
         run: |
