@@ -56,6 +56,12 @@ jobs:
           grep -B2 -A6 -E "Fatal error|Precondition failed|signal trap|Restarting after unexpected exit" xcodebuild.log | grep -v "CoreData" | head -10 | while IFS= read -r line; do
             echo "::notice::$line"
           done
+          for f in $(ls -t "$HOME"/Library/Logs/DiagnosticReports/*.ips 2>/dev/null | head -2); do
+            echo "::notice::crash report: $(basename "$f")"
+            tr ',' '\n' < "$f" | grep -E 'termination|exceptionType|procName|abort|fatal' | head -8 | while IFS= read -r line; do
+              echo "::notice::${line:0:300}"
+            done
+          done
 
       - name: Guardar log e resultados como artefacto
         if: always()

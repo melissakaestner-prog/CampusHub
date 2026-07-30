@@ -3,13 +3,18 @@ import Foundation
 import SwiftData
 @testable import CampusHub
 
-/// Testes de integração da camada de persistência real (SwiftData),
-/// usando um contentor apenas em memória.
+/// Testes de integração da camada de persistência real (SwiftData).
+/// Usa um store SQLite em ficheiro temporário (igual à produção): os
+/// stores em memória têm limitações que provocam crashes no simulador.
+/// A suite corre serializada para evitar criação concorrente de contentores.
+@Suite(.serialized)
 @MainActor
 struct SwiftDataLocalStoreTests {
     private func makeStore() throws -> SwiftDataLocalStore {
         let schema = Schema([ScheduleEntryEntity.self, TimesheetEntryEntity.self])
-        let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+        let url = URL(fileURLWithPath: NSTemporaryDirectory())
+            .appendingPathComponent("campushub-tests-\(UUID().uuidString).store")
+        let configuration = ModelConfiguration(schema: schema, url: url)
         let container = try ModelContainer(for: schema, configurations: [configuration])
         return SwiftDataLocalStore(context: container.mainContext)
     }
