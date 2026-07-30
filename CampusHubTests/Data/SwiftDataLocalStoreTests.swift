@@ -3,32 +3,43 @@ import Foundation
 import SwiftData
 @testable import CampusHub
 
-/// Testes de integração da camada de persistência real (SwiftData).
-/// Usa um store SQLite em ficheiro temporário (igual à produção): os
-/// stores em memória têm limitações que provocam crashes no simulador.
-/// A suite corre serializada para evitar criação concorrente de contentores.
+/// Testes de integração da camada de persistência real (SwiftData),
+/// com um store SQLite em ficheiro temporário por teste.
+///
+/// Importante: o ModelContext não retém o seu ModelContainer. O harness
+/// mantém uma referência forte ao contentor durante o teste — sem ela, o
+/// contentor era desalocado no fim do helper e a primeira operação sobre
+/// o contexto crashava com SIGTRAP ("no active container").
 @Suite(.serialized)
 @MainActor
 struct SwiftDataLocalStoreTests {
-    private func makeStore() throws -> SwiftDataLocalStore {
+    private struct StoreHarness {
+        let container: ModelContainer
+        let store: SwiftDataLocalStore
+    }
+
+    private func makeStore() throws -> StoreHarness {
         let schema = Schema([ScheduleEntryEntity.self, TimesheetEntryEntity.self])
         let url = URL(fileURLWithPath: NSTemporaryDirectory())
             .appendingPathComponent("campushub-tests-\(UUID().uuidString).store")
         let configuration = ModelConfiguration(schema: schema, url: url)
         let container = try ModelContainer(for: schema, configurations: [configuration])
-        return SwiftDataLocalStore(context: container.mainContext)
+        return StoreHarness(
+            container: container,
+            store: SwiftDataLocalStore(context: container.mainContext)
+        )
     }
 
     @Test("Guardar e ler o horário preserva os dados (roundtrip)")
     func scheduleRoundtrip() throws {
-        let store = try makeStore()
+        let harness = try makeStore()
         let entries = [
             Fixtures.scheduleEntry(id: "s1", weekday: .monday),
             Fixtures.scheduleEntry(id: "s2", weekday: .friday),
         ]
 
-        try store.replaceSchedule(with: entries)
-        let fetched = try store.fetchSchedule()
+        try harness.store.replaceSchedule(with: entries)
+        let fetched = try harness.store.fetchSchedule()
 
         #expect(fetched.count == 2)
         #expect(Set(fetched.map(\.id)) == ["s1", "s2"])
@@ -36,35 +47,35 @@ struct SwiftDataLocalStoreTests {
 
     @Test("replaceSchedule substitui o conjunto anterior")
     func replaceScheduleOverwrites() throws {
-        let store = try makeStore()
-        try store.replaceSchedule(with: [Fixtures.scheduleEntry(id: "antigo")])
+        let harness = try makeStore()
+        try harness.store.replaceSchedule(with: [Fixtures.scheduleEntry(id: "antigo")])
 
-        try store.replaceSchedule(with: [Fixtures.scheduleEntry(id: "novo")])
-        let fetched = try store.fetchSchedule()
+        try harness.store.replaceSchedule(with: [Fixtures.scheduleEntry(id: "novo")])
+        let fetched = try harness.store.fetchSchedule()
 
         #expect(fetched.map(\.id) == ["novo"])
     }
 
     @Test("fetchTimesheet devolve apenas os registos do professor pedido")
     func timesheetFiltersByProfessor() throws {
-        let store = try makeStore()
-        try store.insertTimesheetEntry(Fixtures.timesheetEntry(id: "t1", professorId: "p1"))
-        try store.insertTimesheetEntry(Fixtures.timesheetEntry(id: "t2", professorId: "p2"))
+        let harness = try makeStore()
+        try harness.store.insertTimesheetEntry(Fixtures.timesheetEntry(id: "t1", professorId: "p1"))
+        try harness.store.insertTimesheetEntry(Fixtures.timesheetEntry(id: "t2", professorId: "p2"))
 
-        let fetched = try store.fetchTimesheet(professorID: "p1")
+        let fetched = try harness.store.fetchTimesheet(professorID: "p1")
 
         #expect(fetched.map(\.id) == ["t1"])
     }
 
     @Test("replaceTimesheet não afeta registos de outros professores")
     func replaceTimesheetIsScopedToProfessor() throws {
-        let store = try makeStore()
-        try store.insertTimesheetEntry(Fixtures.timesheetEntry(id: "t1", professorId: "p1"))
-        try store.insertTimesheetEntry(Fixtures.timesheetEntry(id: "t2", professorId: "p2"))
+        let harness = try makeStore()
+        try harness.store.insertTimesheetEntry(Fixtures.timesheetEntry(id: "t1", professorId: "p1"))
+        try harness.store.insertTimesheetEntry(Fixtures.timesheetEntry(id: "t2", professorId: "p2"))
 
-        try store.replaceTimesheet(professorID: "p1", with: [Fixtures.timesheetEntry(id: "t3", professorId: "p1")])
+        try harness.store.replaceTimesheet(professorID: "p1", with: [Fixtures.timesheetEntry(id: "t3", professorId: "p1")])
 
-        #expect(try store.fetchTimesheet(professorID: "p1").map(\.id) == ["t3"])
-        #expect(try store.fetchTimesheet(professorID: "p2").map(\.id) == ["t2"])
+        #expect(try harness.store.fetchTimesheet(professorID: "p1").map(\.id) == ["t3"])
+        #expect(try harness.store.fetchTimesheet(professorID: "p2").map(\.id) == ["t2"])
     }
 }
