@@ -18,13 +18,25 @@ jobs:
       - name: Gerar projeto Xcode
         run: xcodegen generate
 
+      - name: Escolher simulador iPhone disponível
+        id: sim
+        run: |
+          DEVICE=$(xcrun simctl list devices available | sed -nE 's/^ *(iPhone [^(]*[^ (]) *\(.*/\1/p' | head -1)
+          if [ -z "$DEVICE" ]; then
+            echo "::error::Nenhum simulador iPhone disponível no runner."
+            xcrun simctl list devices
+            exit 1
+          fi
+          echo "Simulador escolhido: $DEVICE"
+          echo "device=$DEVICE" >> "$GITHUB_OUTPUT"
+
       - name: Compilar e correr os testes
         run: |
           set -o pipefail
           xcodebuild test \
             -project CampusHub.xcodeproj \
             -scheme CampusHub \
-            -destination 'platform=iOS Simulator,name=iPhone 16' \
+            -destination "platform=iOS Simulator,name=${{ steps.sim.outputs.device }}" \
             -resultBundlePath TestResults.xcresult \
             CODE_SIGNING_ALLOWED=NO 2>&1 | tee xcodebuild.log
 
