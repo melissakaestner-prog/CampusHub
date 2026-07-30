@@ -6,9 +6,14 @@ import SwiftData
 // a sincronização substitui o conjunto completo, o que torna relações
 // entre entidades desnecessárias e simplifica a consistência offline.
 
+// Nota: sem @Attribute(.unique) — restrições de unicidade exigem store
+// SQLite e crasham em stores de memória (usados nos testes). A unicidade
+// é garantida pelo servidor (ids) e pela sincronização substituir o
+// conjunto completo.
+
 @Model
 final class ScheduleEntryEntity {
-    @Attribute(.unique) var id: String
+    var id: String
     var unitID: String
     var unitName: String
     var course: String
@@ -53,7 +58,7 @@ final class ScheduleEntryEntity {
 
 @Model
 final class TimesheetEntryEntity {
-    @Attribute(.unique) var id: String
+    var id: String
     var professorID: String
     var date: Date
     var hours: Double
