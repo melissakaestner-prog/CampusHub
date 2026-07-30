@@ -1,0 +1,23 @@
+# Xcode
+DerivedData/
+xcuserdata/
+*.xcodeproj
+*.xcworkspace
+!default.xcworkspace
+*.moved-aside
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+
+# Swift Package Manager
+.build/
+.swiftpm/
+
+# macOS
+.DS_Store
+
+# Backend (Node)
+backend/node_modules/
+backend/db.json
+npm-debug.log*

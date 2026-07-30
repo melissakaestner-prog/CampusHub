@@ -1,0 +1,124 @@
+{
+  "professors": [
+    { "id": "p1", "name": "Melissa Kaestner", "email": "melissa.kaestner@campus.pt" },
+    { "id": "p2", "name": "João Almeida", "email": "joao.almeida@campus.pt" },
+    { "id": "p3", "name": "Rita Fonseca", "email": "rita.fonseca@campus.pt" },
+    { "id": "p4", "name": "Carlos Duarte", "email": "carlos.duarte@campus.pt" }
+  ],
+  "units": [
+    { "id": "u1", "name": "Gestão de Projetos", "course": "CTeSP Desenvolvimento de Software" },
+    { "id": "u2", "name": "Base de Dados (SQL e NoSQL)", "course": "CTeSP Desenvolvimento de Software" },
+    { "id": "u3", "name": "Desenvolvimento Ágil de Software", "course": "CTeSP Desenvolvimento de Software" },
+    { "id": "u4", "name": "Teste e Qualidade", "course": "CTeSP Desenvolvimento para Dispositivos Móveis" },
+    { "id": "u5", "name": "Cibercultura", "course": "CTeSP Cibersegurança" },
+    { "id": "u6", "name": "Redes de Computadores I", "course": "Licenciatura Engenharia de Redes" },
+    { "id": "u7", "name": "Programação Web", "course": "CTeSP Desenvolvimento de Software" },
+    { "id": "u8", "name": "Sistemas Operativos", "course": "Licenciatura Engenharia de Redes" }
+  ],
+  "schedule": [
+    {
+      "id": "s1",
+      "unit": { "id": "u1", "name": "Gestão de Projetos", "course": "CTeSP Desenvolvimento de Software" },
+      "professor": { "id": "p1", "name": "Melissa Kaestner", "email": "melissa.kaestner@campus.pt" },
+      "weekday": 1,
+      "startTime": "18:30",
+      "endTime": "21:30",
+      "room": "B2.04",
+      "classGroup": "DS-2A"
+    },
+    {
+      "id": "s2",
+      "unit": { "id": "u2", "name": "Base de Dados (SQL e NoSQL)", "course": "CTeSP Desenvolvimento de Software" },
+      "professor": { "id": "p1", "name": "Melissa Kaestner", "email": "melissa.kaestner@campus.pt" },
+      "weekday": 2,
+      "startTime": "18:30",
+      "endTime": "21:30",
+      "room": "Lab 1",
+      "classGroup": "DS-1A"
+    },
+    {
+      "id": "s3",
+      "unit": { "id": "u3", "name": "Desenvolvimento Ágil de Software", "course": "CTeSP Desenvolvimento de Software" },
+      "professor": { "id": "p1", "name": "Melissa Kaestner", "email": "melissa.kaestner@campus.pt" },
+      "weekday": 4,
+      "startTime": "18:30",
+      "endTime": "21:30",
+      "room": "B1.02",
+      "classGroup": "DS-2A"
+    },
+    {
+      "id": "s4",
+      "unit": { "id": "u5", "name": "Cibercultura", "course": "CTeSP Cibersegurança" },
+      "professor": { "id": "p1", "name": "Melissa Kaestner", "email": "melissa.kaestner@campus.pt" },
+      "weekday": 5,
+      "startTime": "18:30",
+      "endTime": "20:30",
+      "room": "A1.10",
+      "classGroup": "CS-1A"
+    },
+    {
+      "id": "s5",
+      "unit": { "id": "u6", "name": "Redes de Computadores I", "course": "Licenciatura Engenharia de Redes" },
+      "professor": { "id": "p2", "name": "João Almeida", "email": "joao.almeida@campus.pt" },
+      "weekday": 1,
+      "startTime": "18:30",
+      "endTime": "21:30",
+      "room": "Lab 3",
+      "classGroup": "ER-1A"
+    },
+    {
+      "id": "s6",
+      "unit": { "id": "u7", "name": "Programação Web", "course": "CTeSP Desenvolvimento de Software" },
+      "professor": { "id": "p3", "name": "Rita Fonseca", "email": "rita.fonseca@campus.pt" },
+      "weekday": 3,
+      "startTime": "18:30",
+      "endTime": "21:30",
+      "room": "Lab 2",
+      "classGroup": "DS-1A"
+    },
+    {
+      "id": "s7",
+      "unit": { "id": "u8", "name": "Sistemas Operativos", "course": "Licenciatura Engenharia de Redes" },
+      "professor": { "id": "p4", "name": "Carlos Duarte", "email": "carlos.duarte@campus.pt" },
+      "weekday": 2,
+      "startTime": "18:30",
+      "endTime": "21:30",
+      "room": "A2.01",
+      "classGroup": "ER-2A"
+    }
+  ],
+  "timesheets": [
+    {
+      "id": "t1",
+      "professorId": "p1",
+      "date": "2026-07-06T00:00:00Z",
+      "hours": 3,
+      "unitName": "Gestão de Projetos",
+      "status": "submitted"
+    },
+    {
+      "id": "t2",
+      "professorId": "p1",
+      "date": "2026-07-07T00:00:00Z",
+      "hours": 3,
+      "unitName": "Base de Dados (SQL e NoSQL)",
+      "status": "submitted"
+    },
+    {
+      "id": "t3",
+      "professorId": "p1",
+      "date": "2026-07-09T00:00:00Z",
+      "hours": 3,
+      "unitName": "Desenvolvimento Ágil de Software",
+      "status": "submitted"
+    },
+    {
+      "id": "t4",
+      "professorId": "p1",
+      "date": "2026-07-10T00:00:00Z",
+      "hours": 2,
+      "unitName": "Cibercultura",
+      "status": "submitted"
+    }
+  ]
+}
