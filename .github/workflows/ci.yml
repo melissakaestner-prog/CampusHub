@@ -63,6 +63,15 @@ jobs:
             done
           done
 
+      - name: Exportar diagnósticos de crash
+        if: failure()
+        run: |
+          sleep 15
+          xcrun xcresulttool export diagnostics --path TestResults.xcresult --output-path xcresult-diagnostics 2>/dev/null || true
+          mkdir -p crash-reports
+          find "$HOME/Library/Logs/DiagnosticReports" -name "*.ips" -mmin -30 -exec cp {} crash-reports/ \; 2>/dev/null || true
+          ls -la crash-reports xcresult-diagnostics 2>/dev/null || true
+
       - name: Guardar log e resultados como artefacto
         if: always()
         uses: actions/upload-artifact@v4
@@ -71,6 +80,8 @@ jobs:
           path: |
             xcodebuild.log
             TestResults.xcresult
+            xcresult-diagnostics
+            crash-reports
           if-no-files-found: ignore
 
       - name: Build de simulador (artefacto para demo, ex. Appetize.io)
