@@ -32,7 +32,13 @@ final class SwiftDataLocalStore: LocalStoreProtocol {
     }
 
     func replaceSchedule(with entries: [ScheduleEntry]) throws {
-        try context.delete(model: ScheduleEntryEntity.self)
+        // Apaga registo a registo em vez de delete(model:): o batch delete
+        // não é suportado em stores em memória (usados nos testes) e o
+        // volume de dados aqui é sempre pequeno.
+        let existing = try context.fetch(FetchDescriptor<ScheduleEntryEntity>())
+        for entity in existing {
+            context.delete(entity)
+        }
         for entry in entries {
             context.insert(ScheduleEntryEntity(from: entry))
         }
@@ -57,7 +63,10 @@ final class SwiftDataLocalStore: LocalStoreProtocol {
 
     func replaceTimesheet(professorID: String, with entries: [TimesheetEntry]) throws {
         let predicate = #Predicate<TimesheetEntryEntity> { $0.professorID == professorID }
-        try context.delete(model: TimesheetEntryEntity.self, where: predicate)
+        let existing = try context.fetch(FetchDescriptor<TimesheetEntryEntity>(predicate: predicate))
+        for entity in existing {
+            context.delete(entity)
+        }
         for entry in entries {
             context.insert(TimesheetEntryEntity(from: entry))
         }
